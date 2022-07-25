@@ -1,11 +1,12 @@
 <?php
+
 /**
- * Plugin Name: LKI Wottica_Plugin
- * Plugin URI: https://voyagerone.com.br
+ * Plugin Name: LKI Wottica Plugin
+ * Plugin URI: https://solucoesfly.com.br
  * Description: Custom Plugin.
  * Version: 1.0
- * Author: Leandro Kenji Ishikawa
- * Author URI: https://voyagerone.com.br.
+ * Author: FlyTec
+ * Author URI: https://solucoesfly.com.br
  */
 
 // Exit if accessed directly.
@@ -60,7 +61,7 @@ if (!class_exists('LKI_Wottica_Plugin')) {
               `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;';
-            $wpdb->query($sql);
+            //$wpdb->query($sql);
         }
 
         public static function plugin_deactivation()
@@ -82,7 +83,7 @@ if (!class_exists('LKI_Wottica_Plugin')) {
 
         private function includes()
         {
-            include_once 'includes/class-wc-test.php';
+            include_once 'includes/class-wc-wottica-admin.php';
         }
     }
 
