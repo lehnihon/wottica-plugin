@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Plugin Name: LKI Wottica Plugin
+ * Plugin Name: Wottica Plugin
  * Plugin URI: https://solucoesfly.com.br
  * Description: Custom Plugin.
  * Version: 1.0
  * Author: FlyTec
- * Author URI: https://solucoesfly.com.br
+ * Author URI: https://solucoesfly.com.br.
  */
 
 // Exit if accessed directly.
@@ -50,18 +50,28 @@ if (!class_exists('LKI_Wottica_Plugin')) {
         {
             global $wpdb;
 
-            $sql = 'CREATE TABLE `lki_alcator_calendar` (
+            $sql = 'CREATE TABLE `wottica_taxonomy` (
               `id` int(11) NOT NULL AUTO_INCREMENT,
-              `user_id` int(11),
-              `product_id` int(11),
-              `class_date` DATE,
-              `class_hour` int(11),
+              `name` varchar(191),
+              `type` varchar(25),
+              `location` varchar(25),
               `status` TINYINT(1) DEFAULT 1,
               `updated_at` DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
               `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;';
-            //$wpdb->query($sql);
+            $wpdb->query($sql);
+
+            $sql = 'CREATE TABLE `wottica_taxonomy_itens` (
+              `id` int(11) NOT NULL AUTO_INCREMENT,
+              `name` varchar(191),
+              `taxonomy_id` int(11),
+              `status` TINYINT(1) DEFAULT 1,
+              `updated_at` DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+              `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+              PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=latin1;';
+            $wpdb->query($sql);
         }
 
         public static function plugin_deactivation()
@@ -83,7 +93,8 @@ if (!class_exists('LKI_Wottica_Plugin')) {
 
         private function includes()
         {
-            include_once 'includes/class-wc-wottica-admin.php';
+            include_once 'includes/class-wc-wottica-admin-product.php';
+            include_once 'includes/class-wc-wottica-admin-taxonomy.php';
         }
     }
 

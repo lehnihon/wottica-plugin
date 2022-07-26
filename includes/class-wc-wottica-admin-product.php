@@ -3,9 +3,9 @@
 defined('ABSPATH') || exit;
 
 /**
- * Test.
+ * Admin product custom fields.
  */
-class WC_Wottica_Admin
+class WC_Wottica_Admin_Product
 {
     protected $error_msg = '';
 
@@ -164,4 +164,4 @@ class WC_Wottica_Admin
     }
 }
 
-new WC_Wottica_Admin();
+new WC_Wottica_Admin_Product();
