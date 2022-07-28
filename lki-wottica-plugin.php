@@ -54,6 +54,7 @@ if (!class_exists('LKI_Wottica_Plugin')) {
               `id` int(11) NOT NULL AUTO_INCREMENT,
               `name` varchar(191),
               `type` varchar(25),
+              `identifier` varchar(191) NOT NULL UNIQUE,
               `location` varchar(25),
               `status` TINYINT(1) DEFAULT 1,
               `updated_at` DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,

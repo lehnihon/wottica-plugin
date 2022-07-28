@@ -40,11 +40,13 @@ class WC_Wottica_Admin_Taxonomy
             check_admin_referer('attributes-wottica', '_wpnonce_attributes-wottica');
 
             $name = $_POST['name'];
+            $identifier = $_POST['identifier'];
             $type = $_POST['type'];
             $location = $_POST['location'];
 
             $wpdb->insert('wottica_taxonomy', [
               'name' => $name,
+              'identifier' => $identifier,
               'type' => $type,
               'location' => $location,
             ]);
@@ -183,6 +185,10 @@ class WC_Wottica_Admin_Taxonomy
                 <tr>
                     <th scope="row"><label for="taxonomy_name"><?php _e('Nome'); ?> <span class="description"><?php _e('(required)'); ?></span></label></th>
                     <td><input name="name" required type="text" id="taxonomy_name" class="regular-text"/></td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="taxonomy_identifier"><?php _e('Identificador'); ?> <span class="description"><?php _e('(required)'); ?></span></label></th>
+                    <td><input name="identifier" required type="text" id="taxonomy_identifier" class="regular-text"/></td>
                 </tr>
                 <tr>
                     <th scope="row"><label for="taxonomy_type"><?php _e('Tipo'); ?> </th>

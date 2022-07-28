@@ -42,70 +42,78 @@ class WC_Wottica_Admin_Product
 
     public function extra_options_product_tab_content()
     {
-        ?>
-        <div id='lens_options' class='panel woocommerce_options_panel'>
-            <div class='options_group'>
-                <?php
-                woocommerce_wp_checkbox([
-                    'id' => '_allow_personal_message',
-                    'label' => __('Allow the customer to add a personal message', 'woocommerce'),
-                ]); ?>
-            </div>
-        </div>
+        global $wpdb;
+        global $post;
 
-        <div id='frame_options' class='panel woocommerce_options_panel'>
-            <div class='options_group'>
-                <?php
-                woocommerce_wp_checkbox([
-                    'id' => '_allow_personal_message',
-                    'label' => __('Allow the customer to add a personal message', 'woocommerce'),
-                ]); ?>
-            </div>
-        </div>
-<?php
+        $result = $wpdb->get_results(
+          $wpdb->prepare('SELECT *
+            FROM wottica_taxonomy
+            WHERE type = %s AND location = %s
+            ORDER BY id DESC', ['lens', 'product']),
+            ARRAY_A
+        );
+        echo "<div id='lens_options' class='panel woocommerce_options_panel'>";
+        foreach ($result as $index => $row) {
+            $options = $this->get_items($row['id']);
+            $value = get_post_meta($post->ID, $row['identifier'], true);
+
+            echo "<div class='options_group'>";
+            woocommerce_wp_select([
+              'id' => $row['identifier'],
+              'label' => __($row['name'], 'woocommerce'),
+              'options' => $options,
+              'value' => $value,
+            ]);
+            echo '</div>';
+        }
+        echo '</div>';
+
+        $result = $wpdb->get_results(
+          $wpdb->prepare('SELECT *
+            FROM wottica_taxonomy
+            WHERE type = %s AND location = %s
+            ORDER BY id DESC', ['frame', 'product']),
+            ARRAY_A
+        );
+        echo "<div id='frame_options' class='panel woocommerce_options_panel'>";
+
+        foreach ($result as $index => $row) {
+            $options = $this->get_items($row['id']);
+            $value = get_post_meta($post->ID, $row['identifier'], true);
+
+            echo "<div class='options_group'>";
+            woocommerce_wp_select([
+            'id' => $row['identifier'],
+            'label' => __($row['name'], 'woocommerce'),
+            'options' => $options,
+            'value' => $value,
+          ]);
+            echo '</div>';
+        }
+
+        echo '</div>';
     }
 
     public function save_extra_option_fields($post_id)
     {
         $_SESSION['my_admin_notices'] = 'TESTE';
 
-        $this->save_lens($post_id);
-        $this->save_frame($post_id);
-    }
+        global $wpdb;
+        $result = $wpdb->get_results(
+        $wpdb->prepare('SELECT *
+            FROM wottica_taxonomy
+            WHERE location = %s
+            ORDER BY id DESC', ['product']),
+            ARRAY_A
+        );
 
-    public function my_admin_notices()
-    {
-        if (!empty($_SESSION['my_admin_notices'])) {
-            ?>
-            <div class="notice notice-warning is-dismissible"> 
-              <p><?php echo $_SESSION['my_admin_notices']; ?></p>
-            </div>
-        <?php
-          unset($_SESSION['my_admin_notices']);
-        }
-    }
-
-    private function save_lens($post_id)
-    {
-        $allow_personal_message = isset($_POST['_allow_personal_message']) ? 'yes' : 'no';
-        update_post_meta($post_id, '_allow_personal_message', $allow_personal_message);
-
-        if (isset($_POST['_valid_for_days'])) {
-            update_post_meta($post_id, '_valid_for_days', absint($_POST['_valid_for_days']));
+        foreach ($result as $row) {
+            if (isset($_POST[$row['identifier']])) {
+                update_post_meta($post_id, $row['identifier'], $_POST[$row['identifier']]);
+            }
         }
 
         update_post_meta($post_id, '_lens', isset($_POST['_lens']) ? 'yes' : 'no');
-    }
-
-    private function save_frame($post_id)
-    {
-        $allow_personal_message = isset($_POST['_allow_personal_message']) ? 'yes' : 'no';
-        update_post_meta($post_id, '_allow_personal_message', $allow_personal_message);
-
-        if (isset($_POST['_valid_for_days'])) {
-            update_post_meta($post_id, '_valid_for_days', absint($_POST['_valid_for_days']));
-        }
-
         update_post_meta($post_id, '_frame', isset($_POST['_frame']) ? 'yes' : 'no');
     }
 
@@ -133,27 +141,77 @@ class WC_Wottica_Admin_Product
     public function mytheme_woo_add_custom_variation_fields($loop, $variation_data, $variation)
     {
         echo '<div class="options_group form-row form-row-full show_if_lens">';
+        echo '<h3 style="padding-left:0 !important; margin-top:15px; border-top:1px solid #eee">Dados Lentes</h3>';
+        global $wpdb;
+        global $post;
 
-        // Text Field
-        woocommerce_wp_text_input(
-            [
-                'id' => '_variable_text_field['.$variation->ID.']',
-                'label' => __('Índice de Refração', 'woocommerce'),
-                'placeholder' => 'Digite o indice',
-                'desc_tip' => true,
-                'description' => __('Texto de ajuda.', 'woocommerce'),
-                'value' => get_post_meta($variation->ID, '_variable_text_field', true),
-            ]
+        $result = $wpdb->get_results(
+          $wpdb->prepare('SELECT *
+            FROM wottica_taxonomy
+            WHERE type = %s AND location = %s
+            ORDER BY id DESC', ['lens', 'variation']),
+            ARRAY_A
         );
+        foreach ($result as $index => $row) {
+            $options = $this->get_items($row['id']);
+            $value = get_post_meta($variation->ID, $row['identifier'], true);
 
+            echo "<div class='options_group'>";
+            woocommerce_wp_select([
+              'id' => $row['identifier'].'['.$variation->ID.']',
+              'label' => __($row['name'], 'woocommerce'),
+              'options' => $options,
+              'value' => $value,
+            ]);
+            echo '</div>';
+        }
+        echo '</div>';
+
+        echo '<div class="options_group form-row form-row-full show_if_frame">';
+        echo '<h3 style="padding-left:0 !important; margin-top:15px; border-top:1px solid #eee">Dados Armações</h3>';
+        global $wpdb;
+        global $post;
+
+        $result = $wpdb->get_results(
+          $wpdb->prepare('SELECT *
+            FROM wottica_taxonomy
+            WHERE type = %s AND location = %s
+            ORDER BY id DESC', ['frame', 'variation']),
+            ARRAY_A
+        );
+        foreach ($result as $index => $row) {
+            $options = $this->get_items($row['id']);
+            $value = get_post_meta($variation->ID, $row['identifier'], true);
+
+            echo "<div class='options_group'>";
+            woocommerce_wp_select([
+              'id' => $row['identifier'].'['.$variation->ID.']',
+              'label' => __($row['name'], 'woocommerce'),
+              'options' => $options,
+              'value' => $value,
+            ]);
+            echo '</div>';
+        }
         echo '</div>';
     }
 
     public function mytheme_woo_add_custom_variation_fields_save($post_id)
     {
-        // Text Field
-        $woocommerce_text_field = $_POST['_variable_text_field'][$post_id];
-        update_post_meta($post_id, '_variable_text_field', esc_attr($woocommerce_text_field));
+        global $wpdb;
+        $result = $wpdb->get_results(
+        $wpdb->prepare('SELECT *
+            FROM wottica_taxonomy
+            WHERE type = %s AND location = %s
+            ORDER BY id DESC', ['variation']),
+            ARRAY_A
+        );
+
+        foreach ($result as $row) {
+            $woocommerce_variation = $_POST[$row['identifier']][$post_id];
+            if (isset($woocommerce_variation)) {
+                update_post_meta($post_id, $row['identifier'], esc_attr($woocommerce_variation));
+            }
+        }
     }
 
     public function session_start_admin()
@@ -161,6 +219,38 @@ class WC_Wottica_Admin_Product
         if (!session_id()) {
             session_start();
         }
+    }
+
+    public function my_admin_notices()
+    {
+        if (!empty($_SESSION['my_admin_notices'])) {
+            ?>
+            <div class="notice notice-warning is-dismissible"> 
+              <p><?php echo $_SESSION['my_admin_notices']; ?></p>
+            </div>
+        <?php
+          unset($_SESSION['my_admin_notices']);
+        }
+    }
+
+    private function get_items($taxonomy)
+    {
+        global $wpdb;
+        $options[''] = __('Selecione um valor', 'woocommerce');
+
+        $resultItems = $wpdb->get_results(
+        $wpdb->prepare('SELECT *
+          FROM wottica_taxonomy_itens
+          WHERE taxonomy_id = %d
+          ORDER BY id DESC', $taxonomy),
+          ARRAY_A
+        );
+
+        foreach ($resultItems as $item) {
+            $options[$item['id']] = $item['name'];
+        }
+
+        return $options;
     }
 }
 

@@ -17,6 +17,7 @@ jQuery(function ($) {
       $(".hide_if_lens").hide();
       $(".show_if_lens").show();
       $("input#_frame").prop("checked", false);
+      $("#frame_options").hide();
       resetFrame();
     }
   });
@@ -28,8 +29,9 @@ jQuery(function ($) {
       $(".hide_if_frame").hide();
       $(".show_if_frame").show();
       $("input#_lens").prop("checked", false);
+      $("#lens_options").hide();
       resetLens();
     }
   });
-  $("input#_frame").trigger("change");
+  $("input#_lens").trigger("change");
 });
