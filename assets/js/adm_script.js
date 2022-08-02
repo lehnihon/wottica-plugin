@@ -34,4 +34,10 @@ jQuery(function ($) {
     }
   });
   $("input#_lens").trigger("change");
+  $("input#_frame").trigger("change");
+
+  $(document).on("woocommerce_variations_loaded", function (event) {
+    $("input#_lens").trigger("change");
+    $("input#_frame").trigger("change");
+  });
 });

@@ -63,6 +63,27 @@ if (!class_exists('LKI_Wottica_Plugin')) {
             ) ENGINE=InnoDB DEFAULT CHARSET=latin1;';
             $wpdb->query($sql);
 
+            $sql = 'INSERT INTO `wottica_taxonomy` (name,type,identifier,location) VALUES 
+              ("Material","lens","wottica_lens_material","product"),
+              ("Disponibilidade","lens","wottica_lens_disponibilidade","product"),
+              ("Marca","lens","wottica_lens_marca","product"),
+              ("Natureza de lente","lens","wottica_lens_natureza","product"),
+              ("Qualidade","lens","wottica_lens_qualidade","product"),
+              ("Aplicação","lens","wottica_lens_aplicacao","product"),
+              ("Cor da lente","frame","wottica_frame_corlente","product"),
+              ("Formato da armação","frame","wottica_frame_formato","product"),
+              ("Gênero","frame","wottica_frame_genero","product"),
+              ("Peso","frame","wottica_frame_peso","product"),
+              ("Material da armação","frame","wottica_frame_material","product"),
+              ("Material da haste","frame","wottica_frame_materialhaste","product"),
+              ("Altura da lente","frame","wottica_frame_altura","product"),
+              ("Largura da lente","frame","wottica_frame_largura","product"),
+              ("Largura da ponte","frame","wottica_frame_larguraponte","product"),
+              ("Largura da frontal","frame","wottica_frame_largurafrontal","product"),
+              ("Comprimento da haste","frame","wottica_frame_comprimento","product"),
+              ("Tipo de apoio","frame","wottica_frame_apoio","product")';
+            $wpdb->query($sql);
+
             $sql = 'CREATE TABLE `wottica_taxonomy_itens` (
               `id` int(11) NOT NULL AUTO_INCREMENT,
               `name` varchar(191),
@@ -96,6 +117,7 @@ if (!class_exists('LKI_Wottica_Plugin')) {
         {
             include_once 'includes/class-wc-wottica-admin-product.php';
             include_once 'includes/class-wc-wottica-admin-taxonomy.php';
+            include_once 'includes/class-wc-wottica-api.php';
         }
     }
 

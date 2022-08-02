@@ -146,31 +146,90 @@ class WC_Wottica_Admin_Product
         global $post;
 
         $result = $wpdb->get_results(
-          $wpdb->prepare('SELECT *
-            FROM wottica_taxonomy
-            WHERE type = %s AND location = %s
-            ORDER BY id DESC', ['lens', 'variation']),
-            ARRAY_A
-        );
+            $wpdb->prepare('SELECT *
+              FROM wottica_taxonomy
+              WHERE type = %s AND location = %s
+              ORDER BY id DESC', ['lens', 'variation']),
+              ARRAY_A
+          );
         foreach ($result as $index => $row) {
             $options = $this->get_items($row['id']);
             $value = get_post_meta($variation->ID, $row['identifier'], true);
 
-            echo "<div class='options_group'>";
+            echo "<div class='form-row form-row-full'>";
             woocommerce_wp_select([
-              'id' => $row['identifier'].'['.$variation->ID.']',
-              'label' => __($row['name'], 'woocommerce'),
-              'options' => $options,
-              'value' => $value,
-            ]);
+                'id' => $row['identifier'].'['.$variation->ID.']',
+                'label' => __($row['name'], 'woocommerce'),
+                'options' => $options,
+                'value' => $value,
+              ]);
             echo '</div>';
         }
+
+        $esferico_de = get_post_meta($variation->ID, 'esferico_de', true);
+        echo "<div class='form-row form-row-first'>";
+        woocommerce_wp_select([
+          'id' => 'esferico_de'.'['.$variation->ID.']',
+          'label' => __('Esférico de', 'woocommerce'),
+          'options' => $this->get_items_taxonomy(-30, 20, 0.25),
+          'value' => $esferico_de,
+        ]);
+        echo '</div>';
+
+        $esferico_ate = get_post_meta($variation->ID, 'esferico_ate', true);
+        echo "<div class='form-row form-row-last'>";
+        woocommerce_wp_select([
+          'id' => 'esferico_ate'.'['.$variation->ID.']',
+          'label' => __('Esférico ate', 'woocommerce'),
+          'options' => $this->get_items_taxonomy(-30, 20, 0.25),
+          'value' => $esferico_ate,
+        ]);
+        echo '</div>';
+
+        $cilindrico_de = get_post_meta($variation->ID, 'cilindrico_de', true);
+        echo "<div class='form-row form-row-first'>";
+        woocommerce_wp_select([
+          'id' => 'cilindrico_de'.'['.$variation->ID.']',
+          'label' => __('Cilindrico de', 'woocommerce'),
+          'options' => $this->get_items_taxonomy(-10, 0, 0.25),
+          'value' => $cilindrico_de,
+        ]);
+        echo '</div>';
+
+        $cilindrico_ate = get_post_meta($variation->ID, 'cilindrico_ate', true);
+        echo "<div class='form-row form-row-last'>";
+        woocommerce_wp_select([
+          'id' => 'cilindrico_ate'.'['.$variation->ID.']',
+          'label' => __('Cilindrico ate', 'woocommerce'),
+          'options' => $this->get_items_taxonomy(-10, 0, 0.25),
+          'value' => $cilindrico_ate,
+        ]);
+        echo '</div>';
+
+        $adicao_de = get_post_meta($variation->ID, 'adicao_de', true);
+        echo "<div class='form-row form-row-first'>";
+        woocommerce_wp_select([
+          'id' => 'adicao_de'.'['.$variation->ID.']',
+          'label' => __('Adição de', 'woocommerce'),
+          'options' => $this->get_items_taxonomy(-0.75, 3.5, 0.25),
+          'value' => $adicao_de,
+        ]);
+        echo '</div>';
+
+        $adicao_ate = get_post_meta($variation->ID, 'adicao_ate', true);
+        echo "<div class='form-row form-row-last'>";
+        woocommerce_wp_select([
+          'id' => 'adicao_ate'.'['.$variation->ID.']',
+          'label' => __('Adição ate', 'woocommerce'),
+          'options' => $this->get_items_taxonomy(-0.75, 3.5, 0.25),
+          'value' => $adicao_ate,
+        ]);
+        echo '</div>';
+
         echo '</div>';
 
         echo '<div class="options_group form-row form-row-full show_if_frame">';
         echo '<h3 style="padding-left:0 !important; margin-top:15px; border-top:1px solid #eee">Dados Armações</h3>';
-        global $wpdb;
-        global $post;
 
         $result = $wpdb->get_results(
           $wpdb->prepare('SELECT *
@@ -212,6 +271,25 @@ class WC_Wottica_Admin_Product
                 update_post_meta($post_id, $row['identifier'], esc_attr($woocommerce_variation));
             }
         }
+
+        if (isset($_POST['esferico_de'][$post_id])) {
+            update_post_meta($post_id, 'esferico_de', esc_attr($_POST['esferico_de'][$post_id]));
+        }
+        if (isset($_POST['esferico_ate'][$post_id])) {
+            update_post_meta($post_id, 'esferico_ate', esc_attr($_POST['esferico_ate'][$post_id]));
+        }
+        if (isset($_POST['cilindrico_de'][$post_id])) {
+            update_post_meta($post_id, 'cilindrico_de', esc_attr($_POST['cilindrico_de'][$post_id]));
+        }
+        if (isset($_POST['cilindrico_ate'][$post_id])) {
+            update_post_meta($post_id, 'cilindrico_ate', esc_attr($_POST['cilindrico_ate'][$post_id]));
+        }
+        if (isset($_POST['adicao_de'][$post_id])) {
+            update_post_meta($post_id, 'adicao_de', esc_attr($_POST['adicao_de'][$post_id]));
+        }
+        if (isset($_POST['adicao_ate'][$post_id])) {
+            update_post_meta($post_id, 'adicao_ate', esc_attr($_POST['adicao_ate'][$post_id]));
+        }
     }
 
     public function session_start_admin()
@@ -248,6 +326,19 @@ class WC_Wottica_Admin_Product
 
         foreach ($resultItems as $item) {
             $options[$item['id']] = $item['name'];
+        }
+
+        return $options;
+    }
+
+    private function get_items_taxonomy($min = 0, $max = 10, $add = 1)
+    {
+        $options[''] = __('Selecione um valor', 'woocommerce');
+        $value = $min;
+
+        while ($value <= $max) {
+            $options["$value"] = "$value";
+            $value += $add;
         }
 
         return $options;
