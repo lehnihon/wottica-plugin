@@ -28,16 +28,17 @@ class WC_Wottica_Product
     {
         global $product;
         $link = home_url("/lentes-checkout?id={$product->get_id()}");
+        do_action('woocommerce_before_add_to_cart_button');
         echo do_shortcode("<a href='{$link}' class='button'>Selecionar lente</a>");
+        do_action('woocommerce_after_add_to_cart_button');
     }
 
     public function replace_add_to_cart_loop()
     {
         global $product;
         $link = $product->get_permalink();
-        do_action('woocommerce_before_add_to_cart_button');
+
         echo do_shortcode("<a href='{$link}' class='button'>Ver mais</a>");
-        do_action('woocommerce_after_add_to_cart_button');
     }
 
     public function my_custom_add_to_cart_redirect($url)
