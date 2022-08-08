@@ -11,8 +11,30 @@ class WC_Wottica_Api
 
     public function __construct()
     {
+        add_action('wp_ajax_lki_get_lens', [$this, 'lki_get_lens']);
+        add_action('wp_ajax_nopriv_lki_get_lens', [$this, 'lki_get_lens']);
         add_action('wp_ajax_lki_get_lens_data', [$this, 'lki_get_lens_data']);
         add_action('wp_ajax_nopriv_lki_get_lens_data', [$this, 'lki_get_lens_data']);
+    }
+
+    public static function lki_get_lens()
+    {
+        $args = [
+            'status' => 'publish',
+            'category' => ['lentes'],
+        ];
+        $products = wc_get_products($args);
+        foreach ($products as $product) {
+            $data[] = $product->get_data();
+        }
+
+        echo json_encode([
+          'data' => empty($data) ? [] : $data,
+          'status' => true,
+          'message' => '',
+        ]);
+
+        exit();
     }
 
     public static function lki_get_lens_data()
