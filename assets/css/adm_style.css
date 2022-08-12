@@ -1,0 +1,14 @@
+.custom-input-file {
+  padding: 10px;
+}
+
+.label-input-file {
+  font-size: 12px;
+  line-height: 24px;
+  display: inline-block;
+  width: 150px;
+}
+
+.custom-img-container {
+  margin-top: 10px;
+}

@@ -19,13 +19,23 @@ class WC_Wottica_Api
 
     public static function lki_get_lens()
     {
+        global $wpdb;
+
         $args = [
             'status' => 'publish',
             'category' => ['lentes'],
+            'wottica_lens_marca' => '1',
         ];
         $products = wc_get_products($args);
-        foreach ($products as $product) {
-            $data[] = $product->get_data();
+
+        foreach ($products as $index => $product) {
+            $data[$index] = $product->get_data();
+            if ($product->get_type() == 'variable') {
+                foreach ($product->get_available_variations() as $variation) {
+                    $variation['meta'] = get_post_meta($variation['variation_id']);
+                    $data[$index]['variations'][] = $variation;
+                }
+            }
         }
 
         echo json_encode([
