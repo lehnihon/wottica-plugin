@@ -138,7 +138,7 @@ if (!class_exists('LKI_Wottica_Plugin')) {
             wp_enqueue_script('lki-admin-script', plugins_url('assets/js/adm_script.js', __FILE__), ['jquery']);
         }
 
-        public static function get_items_taxonomy($min = 0, $max = 10, $add = 0.25, $taxonomy)
+        public static function get_items_taxonomy($min = 0, $max = 10, $add = 0.25, $taxonomy = 0)
         {
             $options = '';
             $value = $min;

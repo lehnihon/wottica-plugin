@@ -11,10 +11,39 @@ class WC_Wottica_Api
 
     public function __construct()
     {
+        add_action('wp_ajax_lki_get_filters', [$this, 'lki_get_filters']);
+        add_action('wp_ajax_nopriv_lki_get_filters', [$this, 'lki_get_filters']);
         add_action('wp_ajax_lki_get_lens', [$this, 'lki_get_lens']);
         add_action('wp_ajax_nopriv_lki_get_lens', [$this, 'lki_get_lens']);
-        add_action('wp_ajax_lki_get_lens_data', [$this, 'lki_get_lens_data']);
-        add_action('wp_ajax_nopriv_lki_get_lens_data', [$this, 'lki_get_lens_data']);
+    }
+
+    public static function lki_get_filters()
+    {
+        global $wpdb;
+
+        $result = $wpdb->get_results(
+          $wpdb->prepare('SELECT *
+            FROM wottica_taxonomy
+            WHERE type = %s AND location = %s
+            ORDER BY id ASC', ['lens', 'product']),
+            ARRAY_A
+        );
+        $data = [];
+
+        foreach ($result as $index => $row) {
+            $options = WC_Wottica_Api::get_options($row['id'], $row['data_type']);
+            $data[$index]['identifier'] = $row['identifier'];
+            $data[$index]['name'] = $row['name'];
+            $data[$index]['options'] = $options;
+        }
+
+        echo json_encode([
+          'data' => empty($data) ? [] : $data,
+          'status' => true,
+          'message' => '',
+        ]);
+
+        exit();
     }
 
     public static function lki_get_lens()
@@ -24,7 +53,7 @@ class WC_Wottica_Api
         $args = [
             'status' => 'publish',
             'category' => ['lentes'],
-            'wottica_lens_marca' => '1',
+            '_wottica_lens_esferico_de' => '1',
         ];
         $products = wc_get_products($args);
 
@@ -47,45 +76,34 @@ class WC_Wottica_Api
         exit();
     }
 
-    public static function lki_get_lens_data()
+    public static function get_options($taxonomy, $type)
     {
-        if (empty($_POST['post_id'])) {
-            echo json_encode([
-              'data' => [],
-              'status' => false,
-              'message' => 'post id vazio',
-            ]);
-            exit();
-        }
-        $post_id = $_POST['post_id'];
-        $handle = new WC_Product_Variable($post_id);
-        $variations = $handle->get_children();
+        global $wpdb;
+        $options = [];
 
-        $data = [];
+        $resultItems = $wpdb->get_results(
+        $wpdb->prepare('SELECT *
+          FROM wottica_taxonomy_itens
+          WHERE taxonomy_id = %d
+          ORDER BY id DESC', $taxonomy),
+          ARRAY_A
+        );
 
-        foreach ($variations as $id) {
-            $esferico_ate = get_post_meta($id, 'esferico_ate', true);
-            $cilindrico_de = get_post_meta($id, 'cilindrico_de', true);
-            $cilindrico_ate = get_post_meta($id, 'cilindrico_ate', true);
-            $adicao_de = get_post_meta($id, 'adicao_de', true);
-            $adicao_ate = get_post_meta($id, 'adicao_ate', true);
-            $data[] = [
-              'esferico_de' => $esferico_de,
-              'esferico_ate' => $esferico_ate,
-              'cilindrico_de' => $cilindrico_de,
-              'cilindrico_ate' => $cilindrico_ate,
-              'adicao_de' => $adicao_de,
-              'adicao_ate' => $adicao_ate,
-            ];
+        $resultItems = WC_Wottica_Api::sort_data($resultItems, 'value', $type);
+
+        foreach ($resultItems as $item) {
+            $options[$item['id']] = $item['value'];
         }
 
-        echo json_encode([
-          'data' => $data,
-          'status' => true,
-          'message' => '',
-        ]);
+        return $options;
+    }
 
-        exit();
+    public static function sort_data($data, $field, $type)
+    {
+        $keys = array_column($data, $field);
+        array_multisort($keys, SORT_ASC, $type == 'number' ? SORT_NUMERIC : SORT_REGULAR, $data);
+
+        return $data;
     }
 }
 
