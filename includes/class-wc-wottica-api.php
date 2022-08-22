@@ -53,7 +53,7 @@ class WC_Wottica_Api
         $args = [
             'status' => 'publish',
             'category' => ['lentes'],
-            '_wottica_lens_esferico_de' => '1',
+            '_wottica_lens_esferico' => $_POST['esferico'],
         ];
         $products = wc_get_products($args);
 
@@ -104,6 +104,14 @@ class WC_Wottica_Api
         array_multisort($keys, SORT_ASC, $type == 'number' ? SORT_NUMERIC : SORT_REGULAR, $data);
 
         return $data;
+    }
+
+    public static function show_queries()
+    {
+        global $wpdb;
+        echo '<pre>Query List:';
+        print_r($wpdb->queries);
+        echo '</pre>';
     }
 }
 

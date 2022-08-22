@@ -277,11 +277,22 @@ class WC_Wottica_Admin_Product
 
     public function handle_custom_query_var($query, $query_vars)
     {
-        if (!empty($query_vars['_wottica_lens_esferico_de'])) {
-            $query['meta_query'][] = [
-              'key' => '_wottica_lens_esferico_de',
-              'value' => esc_attr($query_vars['_wottica_lens_esferico_de']),
-            ];
+        if (!empty($query_vars['_wottica_lens_esferico'])) {
+            $query['meta_query']['relation'] = 'OR';
+            foreach ($query_vars['_wottica_lens_esferico'] as $index => $value) {
+                $query['meta_query'][] = [[
+                  'key' => '_wottica_lens_esferico_de',
+                  'value' => esc_attr($value),
+                  'compare' => '<=',
+                  'type' => 'DECIMAL',
+                ],
+                [
+                  'key' => '_wottica_lens_esferico_ate',
+                  'value' => esc_attr($value),
+                  'compare' => '>=',
+                  'type' => 'DECIMAL',
+                ], ];
+            }
         }
 
         if (!empty($query_vars['_wottica_lens_esferico_ate'])) {
@@ -408,7 +419,7 @@ class WC_Wottica_Admin_Product
         $resultItems = $this->sort_data($resultItems, 'value', $type);
 
         foreach ($resultItems as $item) {
-            $options[$item['id']] = $item['value'];
+            $options[$item['value']] = $item['value'];
         }
 
         return $options;
