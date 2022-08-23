@@ -278,55 +278,77 @@ class WC_Wottica_Admin_Product
     public function handle_custom_query_var($query, $query_vars)
     {
         if (!empty($query_vars['_wottica_lens_esferico'])) {
-            $query['meta_query']['relation'] = 'OR';
+            $between = [];
             foreach ($query_vars['_wottica_lens_esferico'] as $index => $value) {
-                $query['meta_query'][] = [[
-                  'key' => '_wottica_lens_esferico_de',
-                  'value' => esc_attr($value),
-                  'compare' => '<=',
-                  'type' => 'DECIMAL',
-                ],
-                [
-                  'key' => '_wottica_lens_esferico_ate',
-                  'value' => esc_attr($value),
-                  'compare' => '>=',
-                  'type' => 'DECIMAL',
-                ], ];
+                $between[] = [
+                  'relation' => 'AND',
+                  [
+                    'key' => '_wottica_lens_esferico_de',
+                    'value' => esc_attr($value),
+                    'compare' => '<=',
+                    'type' => 'DECIMAL',
+                  ],
+                  [
+                    'key' => '_wottica_lens_esferico_ate',
+                    'value' => esc_attr($value),
+                    'compare' => '>=',
+                    'type' => 'DECIMAL',
+                  ],
+                ];
             }
-        }
-
-        if (!empty($query_vars['_wottica_lens_esferico_ate'])) {
             $query['meta_query'][] = [
-              'key' => '_wottica_lens_esferico_ate',
-              'value' => esc_attr($query_vars['_wottica_lens_esferico_ate']),
+              'relation' => 'OR',
+              ...$between,
             ];
         }
 
-        if (!empty($query_vars['_wottica_lens_cilindrico_de'])) {
+        if (!empty($query_vars['_wottica_lens_cilindrico'])) {
+            $between = [];
+            foreach ($query_vars['_wottica_lens_cilindrico'] as $index => $value) {
+                $between[] = [
+                  'relation' => 'AND',
+                  [
+                    'key' => '_wottica_lens_cilindrico_de',
+                    'value' => esc_attr($value),
+                    'compare' => '<=',
+                    'type' => 'DECIMAL',
+                  ],
+                  [
+                    'key' => '_wottica_lens_cilindrico_ate',
+                    'value' => esc_attr($value),
+                    'compare' => '>=',
+                    'type' => 'DECIMAL',
+                  ],
+                ];
+            }
             $query['meta_query'][] = [
-              'key' => '_wottica_lens_cilindrico_de',
-              'value' => esc_attr($query_vars['_wottica_lens_cilindrico_de']),
+              'relation' => 'OR',
+              ...$between,
             ];
         }
 
-        if (!empty($query_vars['_wottica_lens_cilindrico_ate'])) {
+        if (!empty($query_vars['_wottica_lens_adicao'])) {
+            $between = [];
+            foreach ($query_vars['_wottica_lens_adicao'] as $index => $value) {
+                $between[] = [
+                  'relation' => 'AND',
+                  [
+                    'key' => '_wottica_lens_adicao_de',
+                    'value' => esc_attr($value),
+                    'compare' => '<=',
+                    'type' => 'DECIMAL',
+                  ],
+                  [
+                    'key' => '_wottica_lens_adicao_ate',
+                    'value' => esc_attr($value),
+                    'compare' => '>=',
+                    'type' => 'DECIMAL',
+                  ],
+                ];
+            }
             $query['meta_query'][] = [
-              'key' => '_wottica_lens_cilindrico_ate',
-              'value' => esc_attr($query_vars['_wottica_lens_cilindrico_ate']),
-            ];
-        }
-
-        if (!empty($query_vars['_wottica_lens_adicao_de'])) {
-            $query['meta_query'][] = [
-              'key' => '_wottica_lens_adicao_de',
-              'value' => esc_attr($query_vars['_wottica_lens_adicao_de']),
-            ];
-        }
-
-        if (!empty($query_vars['_wottica_lens_adicao_ate'])) {
-            $query['meta_query'][] = [
-              'key' => '_wottica_lens_adicao_ate',
-              'value' => esc_attr($query_vars['_wottica_lens_adicao_ate']),
+              'relation' => 'OR',
+              ...$between,
             ];
         }
 
@@ -348,13 +370,6 @@ class WC_Wottica_Admin_Product
             $query['meta_query'][] = [
               'key' => '_wottica_lens_marca',
               'value' => esc_attr($query_vars['_wottica_lens_marca']),
-            ];
-        }
-
-        if (!empty($query_vars['_wottica_lens_natureza'])) {
-            $query['meta_query'][] = [
-              'key' => '_wottica_lens_natureza',
-              'value' => esc_attr($query_vars['_wottica_lens_natureza']),
             ];
         }
 

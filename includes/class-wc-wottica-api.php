@@ -49,23 +49,16 @@ class WC_Wottica_Api
     public static function lki_get_lens()
     {
         global $wpdb;
+        $args = [];
 
-        $args = [
-            'status' => 'publish',
-            'category' => ['lentes'],
-            '_wottica_lens_esferico' => $_POST['esferico'],
-        ];
-        $products = wc_get_products($args);
-
-        foreach ($products as $index => $product) {
-            $data[$index] = $product->get_data();
-            if ($product->get_type() == 'variable') {
-                foreach ($product->get_available_variations() as $variation) {
-                    $variation['meta'] = get_post_meta($variation['variation_id']);
-                    $data[$index]['variations'][] = $variation;
-                }
-            }
+        if (!empty($_POST['esferico'])) {
+            $args[] = [
+              'key' => '_wottica_lens_esferico_de',
+              'value' => '-10',
+            ];
         }
+
+        $data = WC_Wottica_Api::get_products_filters($args);
 
         echo json_encode([
           'data' => empty($data) ? [] : $data,
@@ -112,6 +105,37 @@ class WC_Wottica_Api
         echo '<pre>Query List:';
         print_r($wpdb->queries);
         echo '</pre>';
+    }
+
+    public static function get_products_filters($filters)
+    {
+        global $wpdb;
+        $data = [];
+        $join = '';
+        $where = '';
+        foreach ($filters as $index => $filter) {
+            $join .= " INNER JOIN {$wpdb->prefix}postmeta m{$index} ON ( {$wpdb->prefix}posts.ID = m{$index}.post_id ) ";
+            $where .= " AND ( m{$index}.meta_key = '{$filter['key']}' AND CAST(m{$index}.meta_value AS DECIMAL) > '{$filter['value']}' ) ";
+        }
+        $query = "
+          SELECT ID
+          FROM {$wpdb->prefix}posts
+          $join
+          WHERE {$wpdb->prefix}posts.post_type = 'product'
+          AND {$wpdb->prefix}posts.post_status = 'publish'
+          $where
+          GROUP BY {$wpdb->prefix}posts.ID
+          ORDER BY {$wpdb->prefix}posts.post_date DESC;
+        ";
+
+        $results = $wpdb->get_results($query);
+        $ids = array_column($results, 'ID');
+        $products = wc_get_products(['include' => $ids]);
+        foreach ($products as $index => $product) {
+            $data[] = $product->get_data();
+        }
+
+        return $data;
     }
 }
 
