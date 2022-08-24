@@ -54,7 +54,55 @@ class WC_Wottica_Api
         if (!empty($_POST['esferico'])) {
             $args[] = [
               'key' => '_wottica_lens_esferico_de',
-              'value' => '-10',
+              'value' => $_POST['esferico'],
+              'compare' => '<=',
+            ];
+            $args[] = [
+              'key' => '_wottica_lens_esferico_ate',
+              'value' => $_POST['esferico'],
+              'compare' => '>=',
+            ];
+        }
+
+        if (!empty($_POST['cilindrico'])) {
+            $args[] = [
+            'key' => '_wottica_lens_cilindrico_de',
+            'value' => $_POST['cilindrico'],
+            'compare' => '<=',
+          ];
+            $args[] = [
+            'key' => '_wottica_lens_cilindrico_ate',
+            'value' => $_POST['cilindrico'],
+            'compare' => '>=',
+          ];
+        }
+
+        if (!empty($_POST['adicao'])) {
+            $args[] = [
+              'key' => '_wottica_lens_adicao_de',
+              'value' => $_POST['adicao'],
+              'compare' => '<=',
+            ];
+            $args[] = [
+              'key' => '_wottica_lens_adicao_ate',
+              'value' => $_POST['adicao'],
+              'compare' => '>=',
+            ];
+        }
+
+        if (!empty($_POST['marca'])) {
+            $args[] = [
+              'key' => '_wottica_lens_marca',
+              'value' => $_POST['marca'],
+              'compare' => '=',
+            ];
+        }
+
+        if (!empty($_POST['material'])) {
+            $args[] = [
+              'key' => '_wottica_lens_material',
+              'value' => $_POST['material'],
+              'compare' => '=',
             ];
         }
 
@@ -113,9 +161,25 @@ class WC_Wottica_Api
         $data = [];
         $join = '';
         $where = '';
-        foreach ($filters as $index => $filter) {
-            $join .= " INNER JOIN {$wpdb->prefix}postmeta m{$index} ON ( {$wpdb->prefix}posts.ID = m{$index}.post_id ) ";
-            $where .= " AND ( m{$index}.meta_key = '{$filter['key']}' AND CAST(m{$index}.meta_value AS DECIMAL) > '{$filter['value']}' ) ";
+        foreach ($filters as $i => $filter) {
+            $compare = empty($filter['compare']) ? '=' : $filter['compare'];
+
+            $join .= " INNER JOIN {$wpdb->prefix}postmeta m{$i} ON ( {$wpdb->prefix}posts.ID = m{$i}.post_id ) ";
+            $where .= " AND ( m{$i}.meta_key = '{$filter['key']}' AND ";
+            if (!is_array($filter['value'])) {
+                $where .= " m{$i}.meta_value {$compare} '{$filter['value']}') ";
+            } else {
+                foreach ($filter['value'] as $j => $value) {
+                    if ($j == 0) {
+                        $where .= ' (';
+                    }
+                    $where .= "CAST(m{$i}.meta_value AS DECIMAL) {$compare} '{$value}' ";
+                    if (count($filter['value']) > $j + 1) {
+                        $where .= ' OR ';
+                    }
+                }
+                $where .= ')) ';
+            }
         }
         $query = "
           SELECT ID
@@ -129,6 +193,10 @@ class WC_Wottica_Api
         ";
 
         $results = $wpdb->get_results($query);
+        if (empty($results)) {
+            return [];
+        }
+
         $ids = array_column($results, 'ID');
         $products = wc_get_products(['include' => $ids]);
         foreach ($products as $index => $product) {

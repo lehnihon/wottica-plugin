@@ -62,7 +62,7 @@ class WC_Wottica_Admin_Taxonomy
             $taxonomyId = $_GET['taxonomyId'];
 
             $wpdb->insert('wottica_taxonomy_itens', [
-              'name' => $name,
+              'value' => $name,
               'taxonomy_id' => $taxonomyId,
             ]);
 
@@ -80,9 +80,9 @@ class WC_Wottica_Admin_Taxonomy
     {
         global $wpdb;
         $result = $wpdb->get_results(
-          $wpdb->prepare('SELECT *
+          'SELECT *
             FROM wottica_taxonomy
-            ORDER BY id DESC'),
+            ORDER BY id DESC',
             ARRAY_A
         ); ?>
           <h1 class="wp-heading-inline">Taxonomias</h1>
@@ -159,7 +159,7 @@ class WC_Wottica_Admin_Taxonomy
                   <tr <?php if ($index % 2 == 0) {
                           echo 'class="alternate"';
                       } ?>> 
-                      <th scope="row"><?php echo $row['name']; ?></th>
+                      <th scope="row"><?php echo $row['value']; ?></th>
                       <td style="width:50px">
                         <a href="<?php echo admin_url(sprintf('admin.php?%s', http_build_query($_GET))).'&action=delete&itemId='.$row['id']; ?>" >
                           <span class="dashicons dashicons-remove"></span>
