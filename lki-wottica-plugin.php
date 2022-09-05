@@ -157,6 +157,7 @@ if (!class_exists('LKI_Wottica_Plugin')) {
             include_once 'includes/class-wc-wottica-admin-taxonomy.php';
             include_once 'includes/class-wc-wottica-api.php';
             include_once 'includes/class-wc-wottica-product.php';
+            include_once 'includes/class-wc-wottica-cart.php';
         }
     }
 
