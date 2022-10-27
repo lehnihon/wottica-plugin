@@ -12,6 +12,7 @@ class WC_Wottica_Product
         add_action('init', [$this, 'remove_add_to_cart_loop']);
         add_action('init', [$this, 'remove_add_to_cart_single']);
         add_action('woocommerce_single_product_summary', [$this, 'replace_add_to_cart_single'], 45);
+        add_shortcode('wottica-lens', [$this, 'shortcode_wottica_lens']);
     }
 
     public function remove_add_to_cart_loop()
@@ -24,13 +25,15 @@ class WC_Wottica_Product
         remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30);
     }
 
-    public function replace_add_to_cart_single()
+    public function shortcode_wottica_lens()
     {
         global $product;
+        if (empty($product)) {
+            return '';
+        }
         $link = home_url("/lentes-checkout?id={$product->get_id()}");
-        do_action('woocommerce_before_add_to_cart_button');
-        echo do_shortcode("<a href='{$link}' class='button'>Selecionar lente</a>");
-        do_action('woocommerce_after_add_to_cart_button');
+
+        echo "<a href='{$link}' class='button'>Selecionar lente</a>";
     }
 
     public function replace_add_to_cart_loop()
