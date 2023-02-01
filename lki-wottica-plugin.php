@@ -129,7 +129,12 @@ if (!class_exists('LKI_Wottica_Plugin')) {
         {
             wp_enqueue_style('lki-style', plugins_url('assets/css/style.css', __FILE__));
             wp_enqueue_script('lki-script', plugins_url('assets/js/script.js', __FILE__), ['jquery']);
-            wp_localize_script('lki-script', 'localizeObj', ['user' => wp_get_current_user()]);
+            wp_localize_script('lki-script', 'localizeObj', [
+              'user' => wp_get_current_user(),
+              'endpoint' => esc_url_raw(rest_url('/wp/v2/media/')),
+              'nonce' => wp_create_nonce('wp_rest'),
+              'api' => admin_url('admin-ajax.php'),
+            ]);
         }
 
         public static function admin_plugin_scripts()
@@ -154,6 +159,7 @@ if (!class_exists('LKI_Wottica_Plugin')) {
         private function includes()
         {
             include_once 'includes/class-wc-wottica-admin-product.php';
+            include_once 'includes/class-wc-wottica-admin-order.php';
             include_once 'includes/class-wc-wottica-admin-taxonomy.php';
             include_once 'includes/class-wc-wottica-api.php';
             include_once 'includes/class-wc-wottica-product.php';

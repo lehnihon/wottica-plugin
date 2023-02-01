@@ -11,7 +11,6 @@ class WC_Wottica_Product
     {
         add_action('init', [$this, 'remove_add_to_cart_loop']);
         add_action('init', [$this, 'remove_add_to_cart_single']);
-        add_action('woocommerce_single_product_summary', [$this, 'replace_add_to_cart_single'], 45);
         add_shortcode('wottica-lens', [$this, 'shortcode_wottica_lens']);
     }
 

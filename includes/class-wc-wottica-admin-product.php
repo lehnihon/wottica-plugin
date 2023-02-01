@@ -46,7 +46,7 @@ class WC_Wottica_Admin_Product
         global $post;
 
         $result = $wpdb->get_results(
-          $wpdb->prepare('SELECT *
+            $wpdb->prepare('SELECT *
             FROM wottica_taxonomy
             WHERE type = %s AND location = %s
             ORDER BY id ASC', ['lens', 'product']),
@@ -89,7 +89,7 @@ class WC_Wottica_Admin_Product
         echo '</div>';
 
         $result = $wpdb->get_results(
-          $wpdb->prepare('SELECT *
+            $wpdb->prepare('SELECT *
             FROM wottica_taxonomy
             WHERE type = %s AND location = %s
             ORDER BY id ASC', ['frame', 'product']),
@@ -135,11 +135,11 @@ class WC_Wottica_Admin_Product
 
     public function save_extra_option_fields($post_id)
     {
-        $_SESSION['my_admin_notices'] = 'TESTE';
+        // $_SESSION['my_admin_notices'] = 'TESTE';
 
         global $wpdb;
         $result = $wpdb->get_results(
-        $wpdb->prepare('SELECT *
+            $wpdb->prepare('SELECT *
             FROM wottica_taxonomy
             WHERE location = %s
             ORDER BY id DESC', ['product']),
@@ -192,8 +192,8 @@ class WC_Wottica_Admin_Product
               FROM wottica_taxonomy
               WHERE type = %s AND location = %s
               ORDER BY id ASC', ['lens', 'variation']),
-              ARRAY_A
-          );
+            ARRAY_A
+        );
         foreach ($result as $index => $row) {
             $options = $this->get_items($row['id'], $row['data_type']);
             $value = get_post_meta($variation->ID, $row['identifier'], true);
@@ -214,7 +214,7 @@ class WC_Wottica_Admin_Product
         echo '<h3 style="padding-left:0 !important; margin-top:15px; border-top:1px solid #eee">Dados Armações</h3>';
 
         $result = $wpdb->get_results(
-          $wpdb->prepare('SELECT *
+            $wpdb->prepare('SELECT *
             FROM wottica_taxonomy
             WHERE type = %s AND location = %s
             ORDER BY id DESC', ['frame', 'variation']),
@@ -240,7 +240,7 @@ class WC_Wottica_Admin_Product
     {
         global $wpdb;
         $result = $wpdb->get_results(
-        $wpdb->prepare('SELECT *
+            $wpdb->prepare('SELECT *
             FROM wottica_taxonomy
             WHERE type = %s AND location = %s
             ORDER BY id DESC', ['variation']),
@@ -301,11 +301,11 @@ class WC_Wottica_Admin_Product
         $options[''] = __('Selecione um valor', 'woocommerce');
 
         $resultItems = $wpdb->get_results(
-        $wpdb->prepare('SELECT *
+            $wpdb->prepare('SELECT *
           FROM wottica_taxonomy_itens
           WHERE taxonomy_id = %d
           ORDER BY id DESC', $taxonomy),
-          ARRAY_A
+            ARRAY_A
         );
 
         $resultItems = $this->sort_data($resultItems, 'value', $type);

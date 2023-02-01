@@ -13,6 +13,7 @@ class WC_Wottica_Cart
         add_action('woocommerce_before_calculate_totals', [$this, 'add_custom_price']);
         add_action('woocommerce_check_cart_items', [$this, 'action_woocommerce_check_cart_items'], 10);
         add_action('woocommerce_proceed_to_checkout', [$this, 'custom_button_proceed_to_checkout'], 20);
+        add_action('woocommerce_checkout_create_order_line_item', [$this, 'save_custom_order_item_meta_data'], 10, 4);
     }
 
     public function display_cart_item_custom_meta_data($item_data, $cart_item)
@@ -46,6 +47,19 @@ class WC_Wottica_Cart
 
         echo '<a href="'.$link.'" class="checkout-button button alt wc-forward">'.
         __('Enviar fotos', 'woocommerce').'</a>';
+    }
+
+    public function save_custom_order_item_meta_data($item, $cart_item_key, $values, $order)
+    {
+        if (isset($values['lens']['id'])) {
+            $item->update_meta_data('_lens_id', $values['lens']['id']);
+        }
+        if (isset($values['lens']['name'])) {
+            $item->update_meta_data('_lens_name', $values['lens']['name']);
+        }
+        if (isset($values['lens']['price'])) {
+            $item->update_meta_data('_lens_price', $values['lens']['price']);
+        }
     }
 }
 
