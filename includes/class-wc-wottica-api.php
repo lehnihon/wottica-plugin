@@ -210,17 +210,13 @@ class WC_Wottica_Api
     {
         global $wpdb;
 
-        $result = $wpdb->get_results(
-            $wpdb->prepare('SELECT *
-            FROM wottica_taxonomy
-            WHERE type = %s AND location = %s
-            ORDER BY id ASC', ['lens', 'product']),
-            ARRAY_A
-        );
+        $result = [
+          ['identifier' => 'marcas-lentes', 'name' => 'Marcas', 'data_type' => 'string'],
+        ];
         $data = [];
 
         foreach ($result as $index => $row) {
-            $options = WC_Wottica_Api::get_options($row['id'], $row['data_type']);
+            $options = WC_Wottica_Api::get_options($row['identifier'], $row['data_type']);
             $data[$index]['identifier'] = $row['identifier'];
             $data[$index]['name'] = $row['name'];
             $data[$index]['options'] = $options;
@@ -242,12 +238,12 @@ class WC_Wottica_Api
 
         if (!empty($_POST['esferico'])) {
             $args[] = [
-              'key' => '_wottica_lens_esferico_de',
+              'key' => 'esferico-de',
               'value' => $_POST['esferico'],
               'compare' => '<=',
             ];
             $args[] = [
-              'key' => '_wottica_lens_esferico_ate',
+              'key' => 'esferico-ate',
               'value' => $_POST['esferico'],
               'compare' => '>=',
             ];
@@ -255,42 +251,55 @@ class WC_Wottica_Api
 
         if (!empty($_POST['cilindrico'])) {
             $args[] = [
-            'key' => '_wottica_lens_cilindrico_de',
+            'key' => 'cilindrico',
             'value' => $_POST['cilindrico'],
             'compare' => '<=',
           ];
             $args[] = [
-            'key' => '_wottica_lens_cilindrico_ate',
-            'value' => $_POST['cilindrico'],
+            'key' => 'cilindrico',
+            'value' => 0,
             'compare' => '>=',
           ];
         }
 
         if (!empty($_POST['adicao'])) {
             $args[] = [
-              'key' => '_wottica_lens_adicao_de',
+              'key' => 'adicao-de',
               'value' => $_POST['adicao'],
               'compare' => '<=',
             ];
             $args[] = [
-              'key' => '_wottica_lens_adicao_ate',
+              'key' => 'adicao-ate',
               'value' => $_POST['adicao'],
+              'compare' => '>=',
+            ];
+        }
+
+        if (!empty($_POST['eixo'])) {
+            $args[] = [
+              'key' => 'eixo',
+              'value' => $_POST['eixo'],
+              'compare' => '<=',
+            ];
+            $args[] = [
+              'key' => 'eixo',
+              'value' => 0,
               'compare' => '>=',
             ];
         }
 
         if (!empty($_POST['marca'])) {
             $args[] = [
-              'key' => '_wottica_lens_marca',
+              'key' => 'marcas-lentes',
               'value' => $_POST['marca'],
               'compare' => '=',
             ];
         }
 
-        if (!empty($_POST['material'])) {
+        if (!empty($_POST['tipo'])) {
             $args[] = [
-              'key' => '_wottica_lens_material',
-              'value' => $_POST['material'],
+              'key' => 'tipo-de-tratamento',
+              'value' => $_POST['tipo'],
               'compare' => '=',
             ];
         }
@@ -312,17 +321,18 @@ class WC_Wottica_Api
         $options = [];
 
         $resultItems = $wpdb->get_results(
-            $wpdb->prepare('SELECT *
-          FROM wottica_taxonomy_itens
-          WHERE taxonomy_id = %d
-          ORDER BY id DESC', $taxonomy),
+            $wpdb->prepare("SELECT DISTINCT meta_value, meta_key
+          FROM {$wpdb->prefix}postmeta
+          WHERE meta_key = %s
+          AND meta_value != ''
+          ORDER BY meta_value ASC", $taxonomy),
             ARRAY_A
         );
 
         $resultItems = WC_Wottica_Api::sort_data($resultItems, 'value', $type);
 
         foreach ($resultItems as $item) {
-            $options[$item['id']] = $item['value'];
+            $options[$item['meta_value']] = $item['meta_value'];
         }
 
         return $options;
