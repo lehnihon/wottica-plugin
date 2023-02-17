@@ -20,7 +20,7 @@ class WC_Wottica_Cart
     {
         if (isset($cart_item['lens']) && isset($cart_item['lens'])) {
             $item_data[] = [
-              'key' => 'Nome',
+              'key' => 'Lente',
               'value' => $cart_item['lens']['name'],
             ];
         }
@@ -30,7 +30,24 @@ class WC_Wottica_Cart
 
     public function add_custom_price($cart_object)
     {
-        foreach ($cart_object->cart_contents as $cart_item) {
+        $id = WC()->session->get('lens_id');
+        $price = WC()->session->get('lens_price');
+        $name = WC()->session->get('lens_name');
+        if (!empty($id)) {
+            $key = array_key_last($cart_object->cart_contents);
+            $cartItem = WC()->cart->cart_contents[$key];
+            $cartItem['lens'] = [
+              'id' => $id,
+              'price' => $price,
+              'name' => $name,
+            ];
+            WC()->cart->cart_contents[$key] = $cartItem;
+
+            WC()->session->set('lens_id', null);
+            WC()->session->set('lens_price', null);
+            WC()->session->set('lens_name', null);
+        }
+        foreach (WC()->cart->cart_contents as $cart_item) {
             $custom_price = $cart_item['data']->get_price() + (isset($cart_item['lens']['price']) ? $cart_item['lens']['price'] : 0);
             $cart_item['data']->set_price($custom_price);
         }

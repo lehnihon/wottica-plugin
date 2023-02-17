@@ -252,12 +252,12 @@ class WC_Wottica_Api
         if (!empty($_POST['cilindrico'])) {
             $args[] = [
             'key' => 'cilindrico',
-            'value' => $_POST['cilindrico'],
+            'value' => 0,
             'compare' => '<=',
           ];
             $args[] = [
             'key' => 'cilindrico',
-            'value' => 0,
+            'value' => $_POST['cilindrico'],
             'compare' => '>=',
           ];
         }
@@ -299,8 +299,8 @@ class WC_Wottica_Api
         if (!empty($_POST['tipo'])) {
             $args[] = [
               'key' => 'tipo-de-tratamento',
-              'value' => $_POST['tipo'],
-              'compare' => '=',
+              'value' => "%{$_POST['tipo']}\";s:4%",
+              'compare' => 'LIKE',
             ];
         }
 
